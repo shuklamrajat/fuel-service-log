@@ -46,28 +46,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: DropdownButton<int>(
-          key: const Key('vehicle-switcher'),
-          value: v.id,
-          underline: const SizedBox.shrink(),
-          items: [
-            for (final x in vehicles) DropdownMenuItem(value: x.id, child: Text(x.name)),
-            const DropdownMenuItem(value: -1, child: Text('+ Add vehicle')),
-          ],
-          onChanged: (id) async {
-            if (id == null) return;
-            if (id == -1) {
-              if (!await requirePro(context, ref, 'multiple_vehicles')) return;
-              if (!context.mounted) return;
-              await Navigator.push(context, MaterialPageRoute(builder: (_) => const VehicleEditScreen()));
-              return;
-            }
-            await ref.read(selectedVehicleIdProvider.notifier).select(id);
-          },
+        title: Semantics(
+          // An AppBar title is announced as a heading; say it is a switcher.
+          button: true,
+          label: 'Switch vehicle',
+          child: DropdownButton<int>(
+            key: const Key('vehicle-switcher'),
+            value: v.id,
+            underline: const SizedBox.shrink(),
+            items: [
+              for (final x in vehicles) DropdownMenuItem(value: x.id, child: Text(x.name)),
+              const DropdownMenuItem(value: -1, child: Text('+ Add vehicle')),
+            ],
+            onChanged: (id) async {
+              if (id == null) return;
+              if (id == -1) {
+                if (!await requirePro(context, ref, 'multiple_vehicles')) return;
+                if (!context.mounted) return;
+                await Navigator.push(context, MaterialPageRoute(builder: (_) => const VehicleEditScreen()));
+                return;
+              }
+              await ref.read(selectedVehicleIdProvider.notifier).select(id);
+            },
+          ),
         ),
         actions: [
           IconButton(
             key: const Key('open-settings'),
+            tooltip: 'Settings',
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => Navigator.push(
               context,

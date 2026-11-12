@@ -165,7 +165,12 @@ class _FillEditScreenState extends ConsumerState<FillEditScreen> {
         actions: [
           TextButton(key: const Key('save-fill'), onPressed: _save, child: const Text('Save')),
           if (widget.fill != null)
-            IconButton(key: const Key('delete-fill'), icon: const Icon(Icons.delete_outline), onPressed: _delete),
+            IconButton(
+              key: const Key('delete-fill'),
+              tooltip: 'Delete fill-up',
+              icon: const Icon(Icons.delete_outline),
+              onPressed: _delete,
+            ),
         ],
       ),
       body: Form(
@@ -310,6 +315,7 @@ class _ServiceEditScreenState extends ConsumerState<ServiceEditScreen> {
           TextButton(key: const Key('save-service'), onPressed: _save, child: const Text('Save')),
           if (widget.service != null)
             IconButton(
+              tooltip: 'Delete service',
               icon: const Icon(Icons.delete_outline),
               onPressed: () async {
                 if (!await confirmDialog(context, 'Delete service?', 'It will be removed from the history.')) return;
@@ -433,6 +439,7 @@ class _ReminderEditScreenState extends ConsumerState<ReminderEditScreen> {
           TextButton(key: const Key('save-reminder'), onPressed: _save, child: const Text('Save')),
           if (widget.reminder != null)
             IconButton(
+              tooltip: 'Delete reminder',
               icon: const Icon(Icons.delete_outline),
               onPressed: () async {
                 await ref.read(repositoryProvider).deleteReminder(widget.reminder!.id);

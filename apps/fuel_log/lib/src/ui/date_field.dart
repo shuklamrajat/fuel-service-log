@@ -17,6 +17,7 @@ class DateField extends StatelessWidget {
       labelText: label,
       hintText: 'YYYY-MM-DD',
       suffixIcon: IconButton(
+        tooltip: 'Pick a date',
         icon: const Icon(Icons.calendar_today),
         onPressed: () async {
           final d = await showDatePicker(
