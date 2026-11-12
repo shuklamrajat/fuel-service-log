@@ -81,6 +81,8 @@ void main() {
       await d.type('vehicle-name', 'Civic');
       await d.tapKey('save-vehicle');
       await d.waitFor(find.byKey(const Key('add-fill')));
+      await d.skipTour();
+      log.check('desktop build shows no ad', false, d.exists('ad-banner'));
       // 500 km on 40 L between two full tanks = 8.00 L/100 km.
       await addFill('2026-10-01', '10000', '35', '52.50');
       await addFill('2026-10-12', '10500', '40', '60.00');

@@ -99,14 +99,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         _ => null,
       },
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: const [
-          NavigationDestination(key: Key('tab-fuel'), icon: Icon(Icons.local_gas_station_outlined), label: 'Fuel'),
-          NavigationDestination(key: Key('tab-service'), icon: Icon(Icons.build_outlined), label: 'Service'),
-          NavigationDestination(key: Key('tab-costs'), icon: Icon(Icons.payments_outlined), label: 'Costs'),
-        ],
+      bottomNavigationBar: AdDock(
+        child: NavigationBar(
+          selectedIndex: _tab,
+          onDestinationSelected: (i) => setState(() => _tab = i),
+          destinations: const [
+            NavigationDestination(key: Key('tab-fuel'), icon: Icon(Icons.local_gas_station_outlined), label: 'Fuel'),
+            NavigationDestination(key: Key('tab-service'), icon: Icon(Icons.build_outlined), label: 'Service'),
+            NavigationDestination(key: Key('tab-costs'), icon: Icon(Icons.payments_outlined), label: 'Costs'),
+          ],
+        ),
       ),
     );
   }

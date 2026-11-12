@@ -9,9 +9,9 @@ field, so they are worked into the title, short and full description.
 |---|---|---|
 | App name (30) | Wrenchnote: Car & Fuel Log | 26 |
 | Short description (80) | Fuel log, MPG tracker & car maintenance reminders. Every car cost in one place. | 79 |
-| Full description (4000) | below | 3706 |
+| Full description (4000) | below | 3747 |
 | Category | Auto & Vehicles (Play) / Utilities (App Store) | |
-| Contains ads | No | |
+| Contains ads | Yes: one AdMob banner on the main screen (paid Pro will remove it) | |
 | In-app purchases | Yes: Pro $19.99/year with 7-day free trial, or $39.99 once | |
 | Target search terms | fuel log, mpg tracker, gas mileage, car maintenance, oil change reminder, service log, fuel economy, car expenses, mileage log, fuel cost | |
 
@@ -30,7 +30,7 @@ App Store (later): subtitle "MPG, service reminders & costs" (30/30), keywords "
 3. `listing-screenshots/03.png`: **See what your car really costs.** Fuel and service totals, and cost per km or mile.
 4. `listing-screenshots/04.png`: **Meet Wrenchnote.** Your car's logbook, with a wrench and a smile.
 5. `listing-screenshots/05.png`: **Your units, your way.** MPG or L/100 km, miles or kilometres, light or dark.
-6. `listing-screenshots/06.png`: **No account. No ads.** Your car's history stays on your phone.
+6. `listing-screenshots/06.png`: **Private by default.** No account. Your car's history stays on your phone.
 
 Raw app captures (no frame) are in `screenshots/`, taken during the passing
 end-to-end run, so every screen shows a working app with real data.
@@ -40,7 +40,7 @@ end-to-end run, so every screen shows a working app with real data.
 ```text
 See what your car really costs, and never miss an oil change. Wrenchnote is a fuel log, MPG tracker and car maintenance reminder in one friendly app, built to give you numbers you can actually trust.
 
-Log a fill-up in seconds and Wrenchnote works out your real fuel economy, tank by tank. Add your services and it reminds you when the next one is due, by date, by distance or both. No account, no ads, and your car's history stays on your phone.
+Log a fill-up in seconds and Wrenchnote works out your real fuel economy, tank by tank. Add your services and it reminds you when the next one is due, by date, by distance or both. No account, no sign-up, and your car's history stays on your phone.
 
 ✨ HOW IT WORKS
 1. Add your car: a name and, if you like, make, model and year
@@ -85,7 +85,7 @@ Wrenchnote is a little logbook with a wrench and a smile, and it's designed to f
 
 🔒 PRIVATE BY DEFAULT
 • No account and no sign-up
-• No ads and no tracking
+• One small banner ad; nothing you enter is ever used for ads
 • Your logs are stored on your phone and never uploaded by us
 • Exports only go where you choose to send them
 

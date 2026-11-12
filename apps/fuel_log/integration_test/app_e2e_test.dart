@@ -124,6 +124,7 @@ void main() {
       await d.type('vehicle-details', '2019 Honda Civic');
       await d.tapKey('save-vehicle');
       await d.waitFor(find.byKey(const Key('add-fill')));
+      await d.skipTour(); // covered by tour_e2e_test.dart
 
       final civicFills = [
         ('2026-09-01', '10000', '40', '60.00', false, false),

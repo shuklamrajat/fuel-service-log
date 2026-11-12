@@ -35,6 +35,38 @@ const fuelConfig = AppConfig(
       body: 'No account and no cloud. Export it whenever you like.',
     ),
   ],
+  tour: [
+    TourStep(
+      target: 'add-fill',
+      icon: Icons.local_gas_station_outlined,
+      title: 'Log a fill-up',
+      body: 'Tap here at the pump. Two full tanks in a row and your real fuel economy appears.',
+    ),
+    TourStep(
+      target: 'vehicle-switcher',
+      icon: Icons.directions_car_outlined,
+      title: 'Your vehicles',
+      body: 'Switch cars here, or add another one for the family or work.',
+    ),
+    TourStep(
+      target: 'tab-service',
+      icon: Icons.build_outlined,
+      title: 'Service history',
+      body: 'Oil changes, tyres and repairs, with reminders before the next one is due.',
+    ),
+    TourStep(
+      target: 'tab-costs',
+      icon: Icons.payments_outlined,
+      title: 'What it really costs',
+      body: 'Fuel and service spending together, with exports for taxes or resale.',
+    ),
+    TourStep(
+      target: 'open-settings',
+      icon: Icons.tune,
+      title: 'Settings and Pro',
+      body: 'Units, currency, theme and Pro features live here. You can take this tour again from Settings any time.',
+    ),
+  ],
   proFeatures: [
     ProFeature(
       id: featureMultipleVehicles,
