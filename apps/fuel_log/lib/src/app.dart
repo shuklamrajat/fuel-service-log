@@ -10,6 +10,7 @@ const featureExport = 'export';
 const fuelConfig = AppConfig(
   appName: 'Wrenchnote',
   tagline: 'Fuel economy, costs and service reminders',
+  privacyPolicyUrl: 'https://shuklamrajat.github.io/widdle-privacy/wrenchnote/',
   seedColor: Color(0xFF3949AB),
   accentColor: Color(0xFFFF7043),
   gradientEndColor: Color(0xFF1A237E),
