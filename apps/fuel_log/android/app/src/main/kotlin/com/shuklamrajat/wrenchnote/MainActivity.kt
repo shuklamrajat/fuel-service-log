@@ -1,4 +1,4 @@
-package com.placeholder.fuel_log
+package com.shuklamrajat.wrenchnote
 
 import io.flutter.embedding.android.FlutterActivity
 

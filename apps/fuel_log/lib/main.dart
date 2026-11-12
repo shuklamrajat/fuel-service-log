@@ -8,11 +8,10 @@ import 'src/app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
-  runApp(ProviderScope(
-    overrides: [
-      sharedPrefsProvider.overrideWithValue(prefs),
-      appConfigProvider.overrideWithValue(fuelConfig),
-    ],
-    child: const FuelApp(),
-  ));
+  runApp(
+    ProviderScope(
+      overrides: [sharedPrefsProvider.overrideWithValue(prefs), appConfigProvider.overrideWithValue(fuelConfig)],
+      child: const FuelApp(),
+    ),
+  );
 }

@@ -48,6 +48,9 @@ void main() {
 
   testWidgets('two vehicles, partial/missed/back-filled fill-ups, reminders, export, units', (tester) async {
     WidgetController.hitTestWarningShouldBeFatal = true;
+    Motion.ambient = false; // endless decorative loops would block pumpAndSettle
+    addTearDown(() => Motion.ambient = true);
+    final semantics = tester.ensureSemantics();
     final log = E2eLog('fuel_log: two vehicles, partial/missed/back-filled fills, reminders, units', artifactRoot);
     final tmp = await Directory.systemTemp.createTemp('fuel_e2e');
     final prefs = await SharedPreferences.getInstance();
@@ -58,7 +61,7 @@ void main() {
     final d = E2eDriver(tester);
     final shots = StoreShots(tester)..usePhoneSize();
 
-    await tester.pumpWidget(ProviderScope(
+    Widget app() => ProviderScope(
       overrides: [
         sharedPrefsProvider.overrideWithValue(prefs),
         appConfigProvider.overrideWithValue(fuelConfig),
@@ -70,16 +73,24 @@ void main() {
         entitlementServiceProvider.overrideWithValue(LocalEntitlementService(prefs, allowDebugPurchase: true)),
       ],
       child: const FuelApp(),
-    ));
+    );
+    await tester.pumpWidget(app());
     await tester.pumpAndSettle();
+    String spoken(String k) => tester.getSemantics(find.byKey(Key(k))).label;
 
     Future<int> fillId(int km) async =>
         (await (db.select(db.fillUps)..where((f) => f.odometerM.equals(km * 1000))).getSingle()).id;
     Future<int> reminderId(String t) async =>
         (await (db.select(db.reminders)..where((r) => r.title.equals(t))).getSingle()).id;
 
-    Future<String?> addFill(String date, String km, String litres, String paid,
-        {bool partial = false, bool missed = false}) async {
+    Future<String?> addFill(
+      String date,
+      String km,
+      String litres,
+      String paid, {
+      bool partial = false,
+      bool missed = false,
+    }) async {
       await d.tapKey('add-fill');
       await d.type('fill-date', date);
       await d.type('fill-odometer', km);
@@ -88,8 +99,9 @@ void main() {
       if (partial) await d.tapKey('fill-full');
       if (missed) await d.tapKey('fill-missed');
       await d.tapKey('save-fill');
-      await d.waitFor(find.byWidgetPredicate(
-          (w) => w.key == const Key('form-error') || w.key == const Key('add-fill')));
+      await d.waitFor(
+        find.byWidgetPredicate((w) => w.key == const Key('form-error') || w.key == const Key('add-fill')),
+      );
       return d.exists('form-error') ? await d.textOf('form-error') : null;
     }
 
@@ -105,6 +117,7 @@ void main() {
     }
 
     try {
+      await shots.take('0_welcome');
       await d.tapKey('onboarding-skip');
       await d.tapKey('add-first-vehicle');
       await d.type('vehicle-name', 'Civic');
@@ -120,18 +133,36 @@ void main() {
         ('2026-10-05', '11900', '30', '45.00', false, true),
         ('2026-10-12', '12400', '40', '62.00', false, false),
       ];
-      log.inputs['civic_fills'] = [for (final f in civicFills) '${f.$1} ${f.$2} km ${f.$3} L \$${f.$4} partial=${f.$5} missed=${f.$6}'];
+      log.inputs['civic_fills'] = [
+        for (final f in civicFills) '${f.$1} ${f.$2} km ${f.$3} L \$${f.$4} partial=${f.$5} missed=${f.$6}',
+      ];
       for (final f in civicFills) {
         log.check('saved fill ${f.$1}', null, await addFill(f.$1, f.$2, f.$3, f.$4, partial: f.$5, missed: f.$6));
       }
       log.check('last tank after F6', '8.00 L/100 km', await d.textOf('last-economy'));
-      log.check('F4 economy before back-fill', true, (await d.textsIn('fill-${await fillId(11100)}')).contains('7.00 L/100 km'));
-      log.check('F5 shows no economy (missed previous)', false,
-          (await d.textsIn('fill-${await fillId(11900)}')).contains('L/100 km'));
+      log.check(
+        'F4 economy before back-fill',
+        true,
+        (await d.textsIn('fill-${await fillId(11100)}')).contains('7.00 L/100 km'),
+      );
+      log.check(
+        'F5 shows no economy (missed previous)',
+        false,
+        (await d.textsIn('fill-${await fillId(11900)}')).contains('L/100 km'),
+      );
 
       log.check('saved back-filled F7', null, await addFill('2026-09-16', '10850', '18', '27.00', partial: true));
-      log.check('F4 economy after back-fill', true, (await d.textsIn('fill-${await fillId(11100)}')).contains('10.60 L/100 km'));
+      log.check(
+        'F4 economy after back-fill',
+        true,
+        (await d.textsIn('fill-${await fillId(11100)}')).contains('10.60 L/100 km'),
+      );
       log.check('average economy', '8.63 L/100 km', await d.textOf('avg-economy'));
+      log.check(
+        'economy chart, one point per measured tank (screen reader)',
+        'Economy per tank. 12 Sep 7.50 L/100 km. 20 Sep 10.60 L/100 km. 12 Oct 8.00 L/100 km.',
+        spoken('economy-chart'),
+      );
       await shots.take('1_fuel');
 
       final bad = await addFill('2026-10-20', '12300', '20', '30.00');
@@ -166,8 +197,11 @@ void main() {
       await d.waitFor(find.byKey(const Key('add-service')));
 
       log.check('oil change after service', 'OK', await d.textsIn('reminder-state-$oil'));
-      log.check('oil change next due', true,
-          (await d.textsIn('reminder-$oil')).contains('Due 14 Mar 2027 or 15,800 km'));
+      log.check(
+        'oil change next due',
+        true,
+        (await d.textsIn('reminder-$oil')).contains('Due 14 Mar 2027 or 15,800 km'),
+      );
       log.check('tire rotation', 'Due soon', await d.textsIn('reminder-state-${await reminderId('Tire rotation')}'));
       log.check('inspection', 'Overdue', await d.textsIn('reminder-state-${await reminderId('Inspection')}'));
       await shots.take('2_reminders');
@@ -179,27 +213,57 @@ void main() {
       log.check('service cost', r'$289.99', await d.textOf('cost-service'));
       log.check('distance', '2,400 km', await d.textOf('cost-distance'));
       log.check('cost per distance', r'$0.25/km', await d.textOf('cost-per-distance'));
+      log.check('fuel vs service ring', r'Fuel $316.25, 52%. Service $289.99, 48%.', spoken('cost-split'));
+      log.check(
+        'spend by month chart',
+        r'Spend by month. Jun nothing. Jul nothing. Aug nothing. '
+            r'Sep $289.24: fuel $209.25, service $79.99. Oct $317.00: fuel $107.00, service $210.00. Nov nothing.',
+        spoken('month-chart'),
+      );
       await shots.take('3_costs');
 
       // Export is Pro: paywall first.
       await d.tapKey('export-csv');
       await d.waitFor(find.byKey(const Key('offer-pro_annual')));
       log.check('paywall shown before export', true, d.exists('paywall'));
-      await d.tapKey('offer-pro_annual');
-      await d.waitUntil(() => sharer.shared.length == 1, 'CSV export');
+      await d.reveal(find.byKey(const Key('offer-pro_annual')));
+      await tester.tap(find.byKey(const Key('offer-pro_annual')));
+      var sawConfetti = false;
+      final confettiEnd = DateTime.now().add(const Duration(seconds: 15));
+      while (sharer.shared.isEmpty) {
+        if (DateTime.now().isAfter(confettiEnd)) throw StateError('CSV export did not start after purchase');
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        await tester.pump();
+        sawConfetti |= find.byKey(const Key('celebration')).evaluate().isNotEmpty;
+      }
+      log.check('confetti plays after buying Pro', true, sawConfetti);
+      await tester.pumpAndSettle();
+      log.check('confetti cleared once landed', 0, find.byKey(const Key('celebration')).evaluate().length);
       await d.tapKey('export-pdf');
       await d.waitUntil(() => sharer.shared.length == 2, 'PDF export');
       final csv = log.keep(sharer.shared[0], 'civic.csv').readAsStringSync().replaceFirst('﻿', '');
       log.keep(sharer.shared[1], 'civic.pdf');
       final rows = csv.split('\r\n');
-      final fillRows = rows.where((l) => RegExp(r'^2026-\d\d-\d\d,\d').hasMatch(l) && l.split(',').length >= 9).toList();
-      log.check('CSV fill rows in odometer order', ['10000.0', '10450.0', '10600.0', '10850.0', '11100.0', '11900.0', '12400.0'],
-          fillRows.map((l) => l.split(',')[1]).toList());
+      final fillRows = rows
+          .where((l) => RegExp(r'^2026-\d\d-\d\d,\d').hasMatch(l) && l.split(',').length >= 9)
+          .toList();
+      log.check('CSV fill rows in odometer order', [
+        '10000.0',
+        '10450.0',
+        '10600.0',
+        '10850.0',
+        '11100.0',
+        '11900.0',
+        '12400.0',
+      ], fillRows.map((l) => l.split(',')[1]).toList());
       log.check('CSV F4 economy', '10.60', fillRows[4].split(',')[7]);
       log.check('CSV F5 missed and no economy', ['yes', ''], [fillRows[5].split(',')[5], fillRows[5].split(',')[7]]);
       log.check('CSV total cost', 'Total cost,606.24', rows.firstWhere((l) => l.startsWith('Total cost')));
-      log.check('CSV average economy', 'Average economy (L/100 km),8.63',
-          rows.firstWhere((l) => l.startsWith('Average economy')));
+      log.check(
+        'CSV average economy',
+        'Average economy (L/100 km),8.63',
+        rows.firstWhere((l) => l.startsWith('Average economy')),
+      );
 
       // Second vehicle (now Pro).
       await d.tapKey('tab-fuel');
@@ -229,10 +293,42 @@ void main() {
       await tester.pumpAndSettle();
       log.check('Civic average in US mpg', '27.27 mpg', await d.textOf('avg-economy'));
       log.check('Civic odometer in miles', '7,705 mi', await d.textOf('odometer'));
+      log.check(
+        'economy chart in US mpg',
+        'Economy per tank. 12 Sep 31.36 mpg. 20 Sep 22.19 mpg. 12 Oct 29.40 mpg.',
+        spoken('economy-chart'),
+      );
       final stored = (await db.select(db.fillUps).get()).map((f) => f.odometerM).reduce((a, b) => a > b ? a : b);
       log.check('stored odometer unchanged by unit switch (m)', 50700000, stored);
+
+      // Dark theme, then close and reopen: theme, units, vehicle and Pro stay.
+      await d.tapKey('open-settings');
+      await d.tapKey('settings-theme');
+      await d.pick('Dark');
+      log.check(
+        'Settings switches the app to dark',
+        Brightness.dark,
+        Theme.of(tester.element(find.byKey(const Key('settings-theme')))).brightness,
+      );
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await shots.take('4_dark_fuel');
+      await d.tapKey('tab-costs');
+      await shots.take('5_dark_costs');
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(app());
+      await d.waitFor(find.byKey(const Key('avg-economy')));
+      log.check(
+        'reopened: still dark',
+        Brightness.dark,
+        Theme.of(tester.element(find.byKey(const Key('avg-economy')))).brightness,
+      );
+      log.check('reopened: US units kept', '27.27 mpg', await d.textOf('avg-economy'));
+      log.check('reopened: no onboarding again', false, d.exists('onboarding'));
     } finally {
       log.write();
+      semantics.dispose();
     }
     expect(log.failures, isEmpty, reason: 'see $artifactRoot/result.json');
     await tester.pumpWidget(const SizedBox.shrink());

@@ -13,10 +13,11 @@ String fmtVolume(int ml, Units u) => '${formatHalfUp(volumeIn(ml, u.volume), 2)}
 String fmtEconomy(int ml, int metres, Units u) =>
     '${formatHalfUp(economy(ml, metres, u.economy), 2)} ${economyLabel(u.economy)}';
 
-String isoDate(DateTime d) =>
-    '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+String isoDate(DateTime d) => '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
 String niceDate(DateTime d) => DateFormat('d MMM yyyy').format(d);
+
+String shortDate(DateTime d) => DateFormat('d MMM').format(d);
 
 DateTime? parseIsoDate(String s) {
   final m = RegExp(r'^\s*(\d{4})-(\d{1,2})-(\d{1,2})\s*$').firstMatch(s);

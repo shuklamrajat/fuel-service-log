@@ -17,7 +17,11 @@ Widget _errorText(BuildContext context, String? e) => e == null
     ? const SizedBox.shrink()
     : Padding(
         padding: const EdgeInsets.only(top: 12),
-        child: Text(e, key: const Key('form-error'), style: TextStyle(color: Theme.of(context).colorScheme.error)),
+        child: Text(
+          e,
+          key: const Key('form-error'),
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
+        ),
       );
 
 // ---------------- vehicle ----------------
@@ -37,39 +41,46 @@ class _VehicleEditScreenState extends ConsumerState<VehicleEditScreen> {
 
   Future<void> _save() async {
     if (!_form.currentState!.validate()) return;
-    final id = await ref.read(repositoryProvider).saveVehicle(VehiclesCompanion(
-          id: widget.vehicle == null ? const Value.absent() : Value(widget.vehicle!.id),
-          name: Value(_name.text.trim()),
-          details: Value(_details.text.trim()),
-        ));
+    final id = await ref
+        .read(repositoryProvider)
+        .saveVehicle(
+          VehiclesCompanion(
+            id: widget.vehicle == null ? const Value.absent() : Value(widget.vehicle!.id),
+            name: Value(_name.text.trim()),
+            details: Value(_details.text.trim()),
+          ),
+        );
     await ref.read(selectedVehicleIdProvider.notifier).select(id);
     if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text(widget.vehicle == null ? 'New vehicle' : 'Edit vehicle'),
-          actions: [TextButton(key: const Key('save-vehicle'), onPressed: _save, child: const Text('Save'))],
-        ),
-        body: Form(
-          key: _form,
-          child: ListView(padding: const EdgeInsets.all(16), children: [
-            TextFormField(
-              key: const Key('vehicle-name'),
-              controller: _name,
-              decoration: const InputDecoration(labelText: 'Name'),
-              validator: (v) => (v ?? '').trim().isEmpty ? 'Give it a name' : null,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              key: const Key('vehicle-details'),
-              controller: _details,
-              decoration: const InputDecoration(labelText: 'Make, model and year (optional)'),
-            ),
-          ]),
-        ),
-      );
+    appBar: AppBar(
+      title: Text(widget.vehicle == null ? 'New vehicle' : 'Edit vehicle'),
+      actions: [TextButton(key: const Key('save-vehicle'), onPressed: _save, child: const Text('Save'))],
+    ),
+    body: Form(
+      key: _form,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          TextFormField(
+            key: const Key('vehicle-name'),
+            controller: _name,
+            decoration: const InputDecoration(labelText: 'Name'),
+            validator: (v) => (v ?? '').trim().isEmpty ? 'Give it a name' : null,
+          ),
+          const SizedBox(height: 12),
+          TextFormField(
+            key: const Key('vehicle-details'),
+            controller: _details,
+            decoration: const InputDecoration(labelText: 'Make, model and year (optional)'),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 // ---------------- fill-up ----------------
@@ -111,17 +122,21 @@ class _FillEditScreenState extends ConsumerState<FillEditScreen> {
     if (!_form.currentState!.validate()) return;
     final u = ref.read(unitsProvider);
     final isNew = widget.fill == null;
-    final r = await ref.read(repositoryProvider).saveFill(FillUpsCompanion(
-          id: isNew ? const Value.absent() : Value(widget.fill!.id),
-          vehicleId: Value(widget.vehicle.id),
-          date: Value(parseIsoDate(_date.text)!),
-          odometerM: Value(metresFrom(parseNumber(_odo.text)!, u.distance)),
-          volumeMl: Value(mlFrom(parseNumber(_vol.text)!, u.volume)),
-          costCents: Value(Money.parse(_cost.text)!),
-          isFull: Value(_full),
-          missedPrevious: Value(_missed),
-          note: Value(_note.text.trim()),
-        ));
+    final r = await ref
+        .read(repositoryProvider)
+        .saveFill(
+          FillUpsCompanion(
+            id: isNew ? const Value.absent() : Value(widget.fill!.id),
+            vehicleId: Value(widget.vehicle.id),
+            date: Value(parseIsoDate(_date.text)!),
+            odometerM: Value(metresFrom(parseNumber(_odo.text)!, u.distance)),
+            volumeMl: Value(mlFrom(parseNumber(_vol.text)!, u.volume)),
+            costCents: Value(Money.parse(_cost.text)!),
+            isFull: Value(_full),
+            missedPrevious: Value(_missed),
+            note: Value(_note.text.trim()),
+          ),
+        );
     if (!mounted) return;
     if (!r.ok) {
       setState(() => _error = r.error);
@@ -155,60 +170,65 @@ class _FillEditScreenState extends ConsumerState<FillEditScreen> {
       ),
       body: Form(
         key: _form,
-        child: ListView(padding: const EdgeInsets.all(16), children: [
-          DateField(controller: _date, label: 'Date', fieldKey: const Key('fill-date')),
-          const SizedBox(height: 12),
-          TextFormField(
-            key: const Key('fill-odometer'),
-            controller: _odo,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: 'Odometer (${distanceLabel(u.distance)})'),
-            validator: (v) => (parseNumber(v ?? '') ?? 0) <= 0 ? 'Enter the odometer reading' : null,
-          ),
-          const SizedBox(height: 12),
-          Row(children: [
-            Expanded(
-              child: TextFormField(
-                key: const Key('fill-volume'),
-                controller: _vol,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: 'Fuel (${volumeLabel(u.volume)})'),
-                validator: (v) => (parseNumber(v ?? '') ?? 0) <= 0 ? 'How much went in' : null,
-              ),
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            DateField(controller: _date, label: 'Date', fieldKey: const Key('fill-date')),
+            const SizedBox(height: 12),
+            TextFormField(
+              key: const Key('fill-odometer'),
+              controller: _odo,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: 'Odometer (${distanceLabel(u.distance)})'),
+              validator: (v) => (parseNumber(v ?? '') ?? 0) <= 0 ? 'Enter the odometer reading' : null,
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: TextFormField(
-                key: const Key('fill-cost'),
-                controller: _cost,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'Total paid'),
-                validator: (v) => Money.parse(v ?? '') == null ? 'An amount like 52.40' : null,
-              ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    key: const Key('fill-volume'),
+                    controller: _vol,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(labelText: 'Fuel (${volumeLabel(u.volume)})'),
+                    validator: (v) => (parseNumber(v ?? '') ?? 0) <= 0 ? 'How much went in' : null,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextFormField(
+                    key: const Key('fill-cost'),
+                    controller: _cost,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(labelText: 'Total paid'),
+                    validator: (v) => Money.parse(v ?? '') == null ? 'An amount like 52.40' : null,
+                  ),
+                ),
+              ],
             ),
-          ]),
-          if (perUnit != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text(perUnit)),
-          SwitchListTile(
-            key: const Key('fill-full'),
-            title: const Text('Filled the tank to the top'),
-            subtitle: const Text('Turn off for a partial fill-up'),
-            value: _full,
-            onChanged: (v) => setState(() => _full = v),
-          ),
-          SwitchListTile(
-            key: const Key('fill-missed'),
-            title: const Text('I forgot to log the fill-up before this one'),
-            subtitle: const Text('Skips the economy for this tank so it stays accurate'),
-            value: _missed,
-            onChanged: (v) => setState(() => _missed = v),
-          ),
-          TextFormField(
-            key: const Key('fill-note'),
-            controller: _note,
-            decoration: const InputDecoration(labelText: 'Note (optional)'),
-          ),
-          _errorText(context, _error),
-        ]),
+            if (perUnit != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text(perUnit)),
+            SwitchListTile(
+              key: const Key('fill-full'),
+              title: const Text('Filled the tank to the top'),
+              subtitle: const Text('Turn off for a partial fill-up'),
+              value: _full,
+              onChanged: (v) => setState(() => _full = v),
+            ),
+            SwitchListTile(
+              key: const Key('fill-missed'),
+              title: const Text('I forgot to log the fill-up before this one'),
+              subtitle: const Text('Skips the economy for this tank so it stays accurate'),
+              value: _missed,
+              onChanged: (v) => setState(() => _missed = v),
+            ),
+            TextFormField(
+              key: const Key('fill-note'),
+              controller: _note,
+              decoration: const InputDecoration(labelText: 'Note (optional)'),
+            ),
+            _errorText(context, _error),
+          ],
+        ),
       ),
     );
   }
@@ -256,7 +276,9 @@ class _ServiceEditScreenState extends ConsumerState<ServiceEditScreen> {
     final u = ref.read(unitsProvider);
     final odo = parseNumber(_odo.text);
     final match = _matching(ref.read(remindersProvider(widget.vehicle.id)).value ?? const []);
-    final r = await ref.read(repositoryProvider).saveService(
+    final r = await ref
+        .read(repositoryProvider)
+        .saveService(
           ServicesCompanion(
             id: widget.service == null ? const Value.absent() : Value(widget.service!.id),
             vehicleId: Value(widget.vehicle.id),
@@ -299,49 +321,54 @@ class _ServiceEditScreenState extends ConsumerState<ServiceEditScreen> {
       ),
       body: Form(
         key: _form,
-        child: ListView(padding: const EdgeInsets.all(16), children: [
-          TextFormField(
-            key: const Key('service-title'),
-            controller: _title,
-            decoration: const InputDecoration(labelText: 'What was done', hintText: 'Oil change'),
-            validator: (v) => (v ?? '').trim().isEmpty ? 'Say what was done' : null,
-          ),
-          if (reminders.isNotEmpty && widget.service == null)
-            Wrap(spacing: 6, children: [
-              for (final r in reminders)
-                ActionChip(label: Text(r.title), onPressed: () => _title.text = r.title),
-            ]),
-          const SizedBox(height: 12),
-          DateField(controller: _date, label: 'Date', fieldKey: const Key('service-date')),
-          const SizedBox(height: 12),
-          TextFormField(
-            key: const Key('service-odometer'),
-            controller: _odo,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: 'Odometer (${distanceLabel(u.distance)}, optional)'),
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            key: const Key('service-cost'),
-            controller: _cost,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(labelText: 'Cost'),
-            validator: (v) => (v ?? '').trim().isEmpty || Money.parse(v!) != null ? null : 'An amount like 79.99',
-          ),
-          if (match != null)
-            CheckboxListTile(
-              key: const Key('service-reset-reminder'),
-              title: Text('Mark "${match.title}" reminder as done'),
-              value: _reset,
-              onChanged: (v) => setState(() => _reset = v ?? true),
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            TextFormField(
+              key: const Key('service-title'),
+              controller: _title,
+              decoration: const InputDecoration(labelText: 'What was done', hintText: 'Oil change'),
+              validator: (v) => (v ?? '').trim().isEmpty ? 'Say what was done' : null,
             ),
-          TextFormField(
-            key: const Key('service-note'),
-            controller: _note,
-            decoration: const InputDecoration(labelText: 'Note (optional)'),
-          ),
-          _errorText(context, _error),
-        ]),
+            if (reminders.isNotEmpty && widget.service == null)
+              Wrap(
+                spacing: 6,
+                children: [
+                  for (final r in reminders) ActionChip(label: Text(r.title), onPressed: () => _title.text = r.title),
+                ],
+              ),
+            const SizedBox(height: 12),
+            DateField(controller: _date, label: 'Date', fieldKey: const Key('service-date')),
+            const SizedBox(height: 12),
+            TextFormField(
+              key: const Key('service-odometer'),
+              controller: _odo,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: 'Odometer (${distanceLabel(u.distance)}, optional)'),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              key: const Key('service-cost'),
+              controller: _cost,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(labelText: 'Cost'),
+              validator: (v) => (v ?? '').trim().isEmpty || Money.parse(v!) != null ? null : 'An amount like 79.99',
+            ),
+            if (match != null)
+              CheckboxListTile(
+                key: const Key('service-reset-reminder'),
+                title: Text('Mark "${match.title}" reminder as done'),
+                value: _reset,
+                onChanged: (v) => setState(() => _reset = v ?? true),
+              ),
+            TextFormField(
+              key: const Key('service-note'),
+              controller: _note,
+              decoration: const InputDecoration(labelText: 'Note (optional)'),
+            ),
+            _errorText(context, _error),
+          ],
+        ),
       ),
     );
   }
@@ -380,15 +407,19 @@ class _ReminderEditScreenState extends ConsumerState<ReminderEditScreen> {
     if (!_form.currentState!.validate()) return;
     final u = ref.read(unitsProvider);
     final dist = parseNumber(_dist.text), lastOdo = parseNumber(_lastOdo.text);
-    await ref.read(repositoryProvider).saveReminder(RemindersCompanion(
-          id: widget.reminder == null ? const Value.absent() : Value(widget.reminder!.id),
-          vehicleId: Value(widget.vehicle.id),
-          title: Value(_title.text.trim()),
-          intervalDays: Value(int.tryParse(_days.text.trim())),
-          intervalM: Value(dist == null ? null : metresFrom(dist, u.distance)),
-          lastDoneDate: Value(parseIsoDate(_lastDate.text)!),
-          lastDoneOdometerM: Value(lastOdo == null ? null : metresFrom(lastOdo, u.distance)),
-        ));
+    await ref
+        .read(repositoryProvider)
+        .saveReminder(
+          RemindersCompanion(
+            id: widget.reminder == null ? const Value.absent() : Value(widget.reminder!.id),
+            vehicleId: Value(widget.vehicle.id),
+            title: Value(_title.text.trim()),
+            intervalDays: Value(int.tryParse(_days.text.trim())),
+            intervalM: Value(dist == null ? null : metresFrom(dist, u.distance)),
+            lastDoneDate: Value(parseIsoDate(_lastDate.text)!),
+            lastDoneOdometerM: Value(lastOdo == null ? null : metresFrom(lastOdo, u.distance)),
+          ),
+        );
     if (mounted) Navigator.pop(context);
   }
 
@@ -412,43 +443,49 @@ class _ReminderEditScreenState extends ConsumerState<ReminderEditScreen> {
       ),
       body: Form(
         key: _form,
-        child: ListView(padding: const EdgeInsets.all(16), children: [
-          TextFormField(
-            key: const Key('reminder-title'),
-            controller: _title,
-            decoration: const InputDecoration(labelText: 'Reminder', hintText: 'Oil change'),
-            validator: (v) => (v ?? '').trim().isEmpty ? 'Name it' : null,
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            key: const Key('reminder-days'),
-            controller: _days,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Every this many days', helperText: '182 = 6 months, 365 = a year'),
-            validator: (v) {
-              final days = int.tryParse((v ?? '').trim());
-              if ((v ?? '').trim().isNotEmpty && (days == null || days <= 0)) return 'Whole days';
-              if ((v ?? '').trim().isEmpty && _dist.text.trim().isEmpty) return 'Set days, distance, or both';
-              return null;
-            },
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            key: const Key('reminder-distance'),
-            controller: _dist,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(labelText: 'Every this many ${distanceLabel(u.distance)}'),
-          ),
-          const SizedBox(height: 12),
-          DateField(controller: _lastDate, label: 'Last done on', fieldKey: const Key('reminder-last-date')),
-          const SizedBox(height: 12),
-          TextFormField(
-            key: const Key('reminder-last-odometer'),
-            controller: _lastOdo,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(labelText: 'Odometer when last done (${distanceLabel(u.distance)})'),
-          ),
-        ]),
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            TextFormField(
+              key: const Key('reminder-title'),
+              controller: _title,
+              decoration: const InputDecoration(labelText: 'Reminder', hintText: 'Oil change'),
+              validator: (v) => (v ?? '').trim().isEmpty ? 'Name it' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              key: const Key('reminder-days'),
+              controller: _days,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Every this many days',
+                helperText: '182 = 6 months, 365 = a year',
+              ),
+              validator: (v) {
+                final days = int.tryParse((v ?? '').trim());
+                if ((v ?? '').trim().isNotEmpty && (days == null || days <= 0)) return 'Whole days';
+                if ((v ?? '').trim().isEmpty && _dist.text.trim().isEmpty) return 'Set days, distance, or both';
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              key: const Key('reminder-distance'),
+              controller: _dist,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'Every this many ${distanceLabel(u.distance)}'),
+            ),
+            const SizedBox(height: 12),
+            DateField(controller: _lastDate, label: 'Last done on', fieldKey: const Key('reminder-last-date')),
+            const SizedBox(height: 12),
+            TextFormField(
+              key: const Key('reminder-last-odometer'),
+              controller: _lastOdo,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'Odometer when last done (${distanceLabel(u.distance)})'),
+            ),
+          ],
+        ),
       ),
     );
   }

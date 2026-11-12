@@ -54,8 +54,15 @@ String buildVehicleCsv(Vehicle v, CostSummary c, EconomyResult eco, Units u, Str
     ..blank()
     ..row(['Fill-ups'])
     ..row([
-      'Date', 'Odometer (${distanceLabel(u.distance)})', 'Fuel (${volumeLabel(u.volume)})', 'Total paid', 'Full tank',
-      'Missed previous', 'Distance since last full (${distanceLabel(u.distance)})', 'Economy (${economyLabel(u.economy)})', 'Note'
+      'Date',
+      'Odometer (${distanceLabel(u.distance)})',
+      'Fuel (${volumeLabel(u.volume)})',
+      'Total paid',
+      'Full tank',
+      'Missed previous',
+      'Distance since last full (${distanceLabel(u.distance)})',
+      'Economy (${economyLabel(u.economy)})',
+      'Note',
     ]);
   for (final f in c.fills) {
     final seg = eco.segmentEndingAt('${f.id}');
@@ -92,13 +99,20 @@ String buildVehicleCsv(Vehicle v, CostSummary c, EconomyResult eco, Units u, Str
     ..row(['Distance (${distanceLabel(u.distance)})', formatHalfUp(distanceIn(c.distanceM, u.distance), 1)])
     ..row([
       'Average economy (${economyLabel(u.economy)})',
-      eco.hasEconomy ? formatHalfUp(economy(eco.totalVolumeMl, eco.totalDistanceM, u.economy), 2) : ''
+      eco.hasEconomy ? formatHalfUp(economy(eco.totalVolumeMl, eco.totalDistanceM, u.economy), 2) : '',
     ]);
   return w.build();
 }
 
 Future<Uint8List> buildVehiclePdf(
-    Vehicle v, CostSummary c, EconomyResult eco, Units u, String period, String currency, DateTime now) {
+  Vehicle v,
+  CostSummary c,
+  EconomyResult eco,
+  Units u,
+  String period,
+  String currency,
+  DateTime now,
+) {
   String m(int cents) => Money.format(cents, currency: currency);
   return buildPdfReport(
     title: 'Vehicle history: ${v.name}',
@@ -139,6 +153,6 @@ Future<Uint8List> buildVehiclePdf(
         ],
       ),
     ],
-    footerNote: 'Made with Fuel & Service Log',
+    footerNote: 'Made with Wrenchnote',
   );
 }

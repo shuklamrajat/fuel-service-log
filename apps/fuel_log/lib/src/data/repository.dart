@@ -29,10 +29,11 @@ class FuelRepository {
   FuelRepository(this.db);
   final FuelDb db;
 
-  Stream<List<Vehicle>> watchVehicles() => (db.select(db.vehicles)
-        ..where((v) => v.archived.equals(false))
-        ..orderBy([(v) => OrderingTerm(expression: v.id)]))
-      .watch();
+  Stream<List<Vehicle>> watchVehicles() =>
+      (db.select(db.vehicles)
+            ..where((v) => v.archived.equals(false))
+            ..orderBy([(v) => OrderingTerm(expression: v.id)]))
+          .watch();
 
   Future<int> saveVehicle(VehiclesCompanion c) async {
     if (c.id.present) {
@@ -42,26 +43,29 @@ class FuelRepository {
     return db.into(db.vehicles).insert(c);
   }
 
-  Stream<List<FillUp>> watchFills(int vehicleId) => (db.select(db.fillUps)
-        ..where((f) => f.vehicleId.equals(vehicleId))
-        ..orderBy([(f) => OrderingTerm(expression: f.odometerM, mode: OrderingMode.desc)]))
-      .watch();
+  Stream<List<FillUp>> watchFills(int vehicleId) =>
+      (db.select(db.fillUps)
+            ..where((f) => f.vehicleId.equals(vehicleId))
+            ..orderBy([(f) => OrderingTerm(expression: f.odometerM, mode: OrderingMode.desc)]))
+          .watch();
 
-  Stream<List<Service>> watchServices(int vehicleId) => (db.select(db.services)
-        ..where((s) => s.vehicleId.equals(vehicleId))
-        ..orderBy([(s) => OrderingTerm(expression: s.date, mode: OrderingMode.desc)]))
-      .watch();
+  Stream<List<Service>> watchServices(int vehicleId) =>
+      (db.select(db.services)
+            ..where((s) => s.vehicleId.equals(vehicleId))
+            ..orderBy([(s) => OrderingTerm(expression: s.date, mode: OrderingMode.desc)]))
+          .watch();
 
-  Stream<List<Reminder>> watchReminders(int vehicleId) => (db.select(db.reminders)
-        ..where((r) => r.vehicleId.equals(vehicleId))
-        ..orderBy([(r) => OrderingTerm(expression: r.id)]))
-      .watch();
+  Stream<List<Reminder>> watchReminders(int vehicleId) =>
+      (db.select(db.reminders)
+            ..where((r) => r.vehicleId.equals(vehicleId))
+            ..orderBy([(r) => OrderingTerm(expression: r.id)]))
+          .watch();
 
   Future<List<OdoReading>> _readings(int vehicleId) async {
     final fills = await (db.select(db.fillUps)..where((f) => f.vehicleId.equals(vehicleId))).get();
-    final svcs = await (db.select(db.services)
-          ..where((s) => s.vehicleId.equals(vehicleId) & s.odometerM.isNotNull()))
-        .get();
+    final svcs = await (db.select(
+      db.services,
+    )..where((s) => s.vehicleId.equals(vehicleId) & s.odometerM.isNotNull())).get();
     return [
       for (final f in fills) (id: 'f${f.id}', date: f.date, odometerM: f.odometerM),
       for (final s in svcs) (id: 's${s.id}', date: s.date, odometerM: s.odometerM!),
@@ -70,8 +74,12 @@ class FuelRepository {
 
   Future<SaveResult> saveFill(FillUpsCompanion c) async {
     final vehicleId = c.vehicleId.value;
-    final err = validateOdometer(await _readings(vehicleId), c.date.value, c.odometerM.value,
-        ignoreId: c.id.present ? 'f${c.id.value}' : null);
+    final err = validateOdometer(
+      await _readings(vehicleId),
+      c.date.value,
+      c.odometerM.value,
+      ignoreId: c.id.present ? 'f${c.id.value}' : null,
+    );
     if (err != null) return SaveResult.error(err);
     if (c.volumeMl.value <= 0) return const SaveResult.error('Enter how much fuel went in.');
     final row = c.copyWith(date: Value(dayOf(c.date.value)));
@@ -89,8 +97,12 @@ class FuelRepository {
   Future<SaveResult> saveService(ServicesCompanion c, {int? resetReminderId}) async {
     final odo = c.odometerM.present ? c.odometerM.value : null;
     if (odo != null) {
-      final err = validateOdometer(await _readings(c.vehicleId.value), c.date.value, odo,
-          ignoreId: c.id.present ? 's${c.id.value}' : null);
+      final err = validateOdometer(
+        await _readings(c.vehicleId.value),
+        c.date.value,
+        odo,
+        ignoreId: c.id.present ? 's${c.id.value}' : null,
+      );
       if (err != null) return SaveResult.error(err);
     }
     final row = c.copyWith(date: Value(dayOf(c.date.value)));
@@ -103,10 +115,9 @@ class FuelRepository {
         id = await db.into(db.services).insert(row);
       }
       if (resetReminderId != null) {
-        await (db.update(db.reminders)..where((r) => r.id.equals(resetReminderId))).write(RemindersCompanion(
-          lastDoneDate: Value(dayOf(c.date.value)),
-          lastDoneOdometerM: Value(odo),
-        ));
+        await (db.update(db.reminders)..where((r) => r.id.equals(resetReminderId))).write(
+          RemindersCompanion(lastDoneDate: Value(dayOf(c.date.value)), lastDoneOdometerM: Value(odo)),
+        );
       }
       return SaveResult.ok(id);
     });
@@ -189,22 +200,25 @@ final currentVehicleProvider = Provider<Vehicle?>((ref) {
   return list.firstWhere((v) => v.id == id, orElse: () => list.first);
 });
 
-final fillsProvider =
-    StreamProvider.family<List<FillUp>, int>((ref, id) => ref.watch(repositoryProvider).watchFills(id));
-final servicesProvider =
-    StreamProvider.family<List<Service>, int>((ref, id) => ref.watch(repositoryProvider).watchServices(id));
-final remindersProvider =
-    StreamProvider.family<List<Reminder>, int>((ref, id) => ref.watch(repositoryProvider).watchReminders(id));
+final fillsProvider = StreamProvider.family<List<FillUp>, int>(
+  (ref, id) => ref.watch(repositoryProvider).watchFills(id),
+);
+final servicesProvider = StreamProvider.family<List<Service>, int>(
+  (ref, id) => ref.watch(repositoryProvider).watchServices(id),
+);
+final remindersProvider = StreamProvider.family<List<Reminder>, int>(
+  (ref, id) => ref.watch(repositoryProvider).watchReminders(id),
+);
 
 FillInput toInput(FillUp f) => FillInput(
-      id: '${f.id}',
-      date: f.date,
-      odometerM: f.odometerM,
-      volumeMl: f.volumeMl,
-      costCents: f.costCents,
-      isFull: f.isFull,
-      missedPrevious: f.missedPrevious,
-    );
+  id: '${f.id}',
+  date: f.date,
+  odometerM: f.odometerM,
+  volumeMl: f.volumeMl,
+  costCents: f.costCents,
+  isFull: f.isFull,
+  missedPrevious: f.missedPrevious,
+);
 
 final economyProvider = Provider.family<EconomyResult?, int>((ref, id) {
   final fills = ref.watch(fillsProvider(id)).value;

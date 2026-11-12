@@ -19,10 +19,10 @@ int metresFrom(double value, DistanceUnit u) => (value * (u == DistanceUnit.km ?
 double distanceIn(int metres, DistanceUnit u) => metres / (u == DistanceUnit.km ? 1000 : metresPerMile);
 
 double _mlPer(VolumeUnit u) => switch (u) {
-      VolumeUnit.l => 1000,
-      VolumeUnit.galUs => mlPerGalUs,
-      VolumeUnit.galUk => mlPerGalUk,
-    };
+  VolumeUnit.l => 1000,
+  VolumeUnit.galUs => mlPerGalUs,
+  VolumeUnit.galUk => mlPerGalUk,
+};
 
 int mlFrom(double value, VolumeUnit u) => (value * _mlPer(u)).round();
 
@@ -34,26 +34,26 @@ double mpgUs(int ml, int metres) => (metres / metresPerMile) / (ml / mlPerGalUs)
 double mpgUk(int ml, int metres) => (metres / metresPerMile) / (ml / mlPerGalUk);
 
 double economy(int ml, int metres, EconomyUnit u) => switch (u) {
-      EconomyUnit.lPer100km => lPer100km(ml, metres),
-      EconomyUnit.kmPerL => kmPerL(ml, metres),
-      EconomyUnit.mpgUs => mpgUs(ml, metres),
-      EconomyUnit.mpgUk => mpgUk(ml, metres),
-    };
+  EconomyUnit.lPer100km => lPer100km(ml, metres),
+  EconomyUnit.kmPerL => kmPerL(ml, metres),
+  EconomyUnit.mpgUs => mpgUs(ml, metres),
+  EconomyUnit.mpgUk => mpgUk(ml, metres),
+};
 
 String economyLabel(EconomyUnit u) => switch (u) {
-      EconomyUnit.lPer100km => 'L/100 km',
-      EconomyUnit.kmPerL => 'km/L',
-      EconomyUnit.mpgUs => 'mpg',
-      EconomyUnit.mpgUk => 'mpg (UK)',
-    };
+  EconomyUnit.lPer100km => 'L/100 km',
+  EconomyUnit.kmPerL => 'km/L',
+  EconomyUnit.mpgUs => 'mpg',
+  EconomyUnit.mpgUk => 'mpg (UK)',
+};
 
 String distanceLabel(DistanceUnit u) => u == DistanceUnit.km ? 'km' : 'mi';
 
 String volumeLabel(VolumeUnit u) => switch (u) {
-      VolumeUnit.l => 'L',
-      VolumeUnit.galUs => 'gal',
-      VolumeUnit.galUk => 'gal (UK)',
-    };
+  VolumeUnit.l => 'L',
+  VolumeUnit.galUs => 'gal',
+  VolumeUnit.galUk => 'gal (UK)',
+};
 
 /// Half-up rounding to [decimals] places for display. A tiny nudge keeps
 /// values like 2.675 (stored as 2.67499...) rounding the way people expect.
@@ -90,7 +90,13 @@ class FillInput {
 
 /// Distance driven and fuel used between two full fill-ups, ending at [endId].
 class Segment {
-  const Segment({required this.startId, required this.endId, required this.distanceM, required this.volumeMl, required this.costCents});
+  const Segment({
+    required this.startId,
+    required this.endId,
+    required this.distanceM,
+    required this.volumeMl,
+    required this.costCents,
+  });
   final String startId;
   final String endId;
   final int distanceM;
@@ -169,8 +175,7 @@ String? validateOdometer(Iterable<OdoReading> existing, DateTime date, int odome
   return null;
 }
 
-String _iso(DateTime d) =>
-    '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+String _iso(DateTime d) => '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
 // ---------- reminders ----------
 
@@ -205,9 +210,11 @@ ReminderStatus reminderStatus({
     dueDate = DateTime(l.year, l.month, l.day + intervalDays);
     // Count calendar days so a DST change does not make it 8.96 days.
     final today = _day(now);
-    daysLeft = DateTime.utc(dueDate.year, dueDate.month, dueDate.day)
-        .difference(DateTime.utc(today.year, today.month, today.day))
-        .inDays;
+    daysLeft = DateTime.utc(
+      dueDate.year,
+      dueDate.month,
+      dueDate.day,
+    ).difference(DateTime.utc(today.year, today.month, today.day)).inDays;
     state = worse(state, daysLeft <= 0 ? DueState.overdue : (daysLeft <= soonDays ? DueState.soon : DueState.ok));
   }
   int? dueOdo, metresLeft;
@@ -219,7 +226,13 @@ ReminderStatus reminderStatus({
       state = worse(state, metresLeft <= 0 ? DueState.overdue : (metresLeft <= soonM ? DueState.soon : DueState.ok));
     }
   }
-  return ReminderStatus(dueDate: dueDate, dueOdometerM: dueOdo, daysLeft: daysLeft, metresLeft: metresLeft, state: state);
+  return ReminderStatus(
+    dueDate: dueDate,
+    dueOdometerM: dueOdo,
+    daysLeft: daysLeft,
+    metresLeft: metresLeft,
+    state: state,
+  );
 }
 
 /// Money per kilometre, or null without any distance.
