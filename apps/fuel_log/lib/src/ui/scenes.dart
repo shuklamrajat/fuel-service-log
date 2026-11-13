@@ -433,3 +433,71 @@ void fleetProScene(Canvas c, Size s, SceneFrame f) {
   );
   paintSparkField(c, s, f, _orange, count: 7, seed: 13);
 }
+
+/// The fuel hero's gauge: a red, yellow, green arc and a needle that swings
+/// to [score] (0 worst to 1 best: the last tank against the average), with a
+/// little wobble while ambient motion is on.
+ScenePaint economyGaugeScene({required double score, required Color ink}) => (Canvas c, Size s, SceneFrame f) {
+  final o = Offset(s.width / 2, s.height * 0.68);
+  final r = math.min(s.width / 2, s.height * 0.62) * 0.86;
+  final arc = Rect.fromCircle(center: o, radius: r);
+  const start = math.pi * 0.85, sweep = math.pi * 1.3;
+  final grow = phase(f.intro, 0, 0.45);
+  if (grow > 0.01) {
+    c.drawArc(
+      arc,
+      start,
+      sweep * grow,
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = r * 0.2
+        ..strokeCap = StrokeCap.butt
+        // Rotated rather than started at 0.85 turns: a sweep past a full turn
+        // wraps the colours, and red would show again at the green end.
+        ..shader = const SweepGradient(
+          endAngle: math.pi * 1.3,
+          colors: [Color(0xFFEF5350), Color(0xFFFFCA28), Color(0xFF66BB6A)],
+          transform: GradientRotation(math.pi * 0.85),
+        ).createShader(arc),
+    );
+  }
+  // Ticks.
+  for (var i = 0; i <= 6; i++) {
+    final a = start + sweep * i / 6;
+    final dir = Offset(math.cos(a), math.sin(a));
+    c.drawLine(o + dir * r * 0.66, o + dir * r * 0.78, Ink2.stroke(ink.withValues(alpha: 0.7 * grow), 2));
+  }
+  final swing = phase(f.intro, 0.3, 0.9, Curves.elasticOut);
+  final wobble = 0.015 * math.sin(f.loop * 6 * math.pi);
+  final a = start + sweep * (score.clamp(0.0, 1.0) * swing + wobble);
+  final tip = o + Offset(math.cos(a), math.sin(a)) * r * 0.82;
+  c.drawLine(o, tip, Ink2.stroke(_orange, r * 0.08));
+  c.drawCircle(o, r * 0.14, Ink2.fill(ink));
+  c.drawCircle(o, r * 0.07, Ink2.fill(_orangeDark));
+};
+
+/// A strip of road under the fuel hero: the car drives across with moving
+/// dashes and a puff from the exhaust. Still frame: parked in the middle.
+void roadStripScene(Canvas c, Size s, SceneFrame f) {
+  final w = s.width, h = s.height;
+  final road = Rect.fromLTWH(0, h * 0.62, w, h * 0.3);
+  c.drawRRect(RRect.fromRectAndRadius(road, const Radius.circular(6)), Ink2.fill(Colors.black.withValues(alpha: 0.22)));
+  final dash = 18.0;
+  final shift = (f.loop * 8 % 1) * dash * 2;
+  for (var x = -dash * 2 - shift; x < w; x += dash * 2) {
+    c.drawLine(Offset(x, road.center.dy), Offset(x + dash, road.center.dy), Ink2.stroke(const Color(0xFFFFE082), 2.5));
+  }
+  final carW = h * 1.25;
+  final drive = f.loop == 0 ? 0.5 : f.loop;
+  final x = -carW + (w + carW * 2) * drive;
+  final arrive = phase(f.intro, 0.2, 0.6, Curves.easeOutBack);
+  final bounce = math.sin(f.loop * 40 * math.pi) * 0.8;
+  // Exhaust puffs behind the car.
+  for (var i = 0; i < 3; i++) {
+    final t = (f.loop * 12 + i / 3) % 1;
+    c.drawCircle(Offset(x - carW * 0.55 - t * 20, road.top + h * 0.02 - t * 6), 2 + 4 * t,
+        Ink2.fill(Colors.white.withValues(alpha: 0.4 * (1 - t) * arrive)));
+  }
+  if (arrive > 0.02) _car(c, Offset(x, road.top + h * 0.2), carW * arrive, f, spin: f.loop * 30, bounce: bounce, body: _orange);
+}

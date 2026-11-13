@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 
 import 'package:app_core/app_core.dart';
 import 'package:flutter/material.dart';
@@ -147,7 +146,9 @@ class FuelTab extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 96),
       children: [
         BrandPanel(
-          child: Row(
+          child: Column(
+            children: [
+              Row(
             children: [
               Expanded(
                 child: Column(
@@ -191,9 +192,20 @@ class FuelTab extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               SizedBox(
-                width: 92,
+                width: 112,
                 height: 92,
-                child: AnimatedScene(paint: (c, s, f) => _panelGauge(c, s, f, brand.onBrand), aspectRatio: 1),
+                child: AnimatedScene(
+                  paint: economyGaugeScene(score: _score(eco, last), ink: brand.onBrand),
+                  aspectRatio: 112 / 92,
+                ),
+              ),
+            ],
+          ),
+              const SizedBox(height: 6),
+              const SizedBox(
+                height: 44,
+                width: double.infinity,
+                child: AnimatedScene(paint: roadStripScene, aspectRatio: 7, loop: Duration(seconds: 7)),
               ),
             ],
           ),
@@ -275,18 +287,13 @@ class FuelTab extends ConsumerWidget {
   }
 }
 
-/// The little dial in the hero panel: the needle swings up when the screen
-/// opens, then idles.
-void _panelGauge(Canvas c, Size s, SceneFrame f, Color ink) {
-  final o = Offset(s.width / 2, s.height * 0.6);
-  final r = s.width * 0.42;
-  final arc = Rect.fromCircle(center: o, radius: r);
-  c.drawArc(arc, math.pi * 0.85, math.pi * 1.3, false, Ink2.stroke(ink.withValues(alpha: 0.25), 8));
-  final level = phase(f.intro, 0.1, 0.9, Curves.easeOutBack) * 0.72 + 0.02 * f.wave();
-  c.drawArc(arc, math.pi * 0.85, math.pi * 1.3 * level, false, Ink2.stroke(f.brand.accent, 8));
-  final a = math.pi * 0.85 + math.pi * 1.3 * level;
-  c.drawLine(o, o + Offset(math.cos(a), math.sin(a)) * r * 0.7, Ink2.stroke(ink, 4));
-  c.drawCircle(o, 6, Ink2.fill(ink));
+/// Where the hero gauge's needle points: the last tank against the average,
+/// in distance per volume. Better than average leans green, worse leans red.
+double _score(EconomyResult? eco, Segment? last) {
+  if (eco == null || !eco.hasEconomy || last == null || last.volumeMl <= 0) return 0.5;
+  final avg = eco.totalDistanceM / eco.totalVolumeMl;
+  final mine = last.distanceM / last.volumeMl;
+  return (0.5 + (mine / avg - 1) * 1.25).clamp(0.08, 0.95);
 }
 
 class _BrandChip extends StatelessWidget {
