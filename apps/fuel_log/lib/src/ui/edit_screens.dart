@@ -13,14 +13,24 @@ String _num(double v, int decimals) {
   return s.contains('.') ? s.replaceFirst(RegExp(r'\.?0+$'), '') : s;
 }
 
-Widget _errorText(BuildContext context, String? e) => e == null
-    ? const SizedBox.shrink()
-    : Padding(
-        padding: const EdgeInsets.only(top: 12),
-        child: Text(
-          e,
-          key: const Key('form-error'),
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
+/// The reason Save was refused, pinned under the title bar. At the bottom of the
+/// form it sat below the keyboard on shorter screens (the Fold unfolded), so
+/// tapping Save looked like it did nothing.
+PreferredSizeWidget? _errorBar(BuildContext context, String? e) => e == null
+    ? null
+    : PreferredSize(
+        preferredSize: const Size.fromHeight(48),
+        child: Container(
+          width: double.infinity,
+          color: Theme.of(context).colorScheme.errorContainer,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Text(
+            e,
+            key: const Key('form-error'),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Theme.of(context).colorScheme.onErrorContainer),
+          ),
         ),
       );
 
@@ -162,6 +172,7 @@ class _FillEditScreenState extends ConsumerState<FillEditScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.fill == null ? 'Add fill-up' : 'Edit fill-up'),
+        bottom: _errorBar(context, _error),
         actions: [
           TextButton(key: const Key('save-fill'), onPressed: _save, child: const Text('Save')),
           if (widget.fill != null)
@@ -231,7 +242,6 @@ class _FillEditScreenState extends ConsumerState<FillEditScreen> {
               controller: _note,
               decoration: const InputDecoration(labelText: 'Note (optional)'),
             ),
-            _errorText(context, _error),
           ],
         ),
       ),
@@ -311,6 +321,7 @@ class _ServiceEditScreenState extends ConsumerState<ServiceEditScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.service == null ? 'Log service' : 'Edit service'),
+        bottom: _errorBar(context, _error),
         actions: [
           TextButton(key: const Key('save-service'), onPressed: _save, child: const Text('Save')),
           if (widget.service != null)
@@ -372,7 +383,6 @@ class _ServiceEditScreenState extends ConsumerState<ServiceEditScreen> {
               controller: _note,
               decoration: const InputDecoration(labelText: 'Note (optional)'),
             ),
-            _errorText(context, _error),
           ],
         ),
       ),
