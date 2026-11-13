@@ -1,0 +1,4 @@
+Device: pixel_6 API 35, part: release
+Release APK session: 21/22 checks passed
+  FAIL sideways: the entries are still on screen: want True, got 'False'
+RESULT: release on pixel_6 API 35 FAILED
