@@ -2,6 +2,7 @@ import 'package:app_core/app_core.dart';
 import 'package:flutter/material.dart';
 
 import 'ui/home_screen.dart';
+import 'ui/logo.dart';
 import 'ui/scenes.dart';
 
 const featureMultipleVehicles = 'multiple_vehicles';
@@ -15,6 +16,7 @@ const fuelConfig = AppConfig(
   accentColor: Color(0xFFFF7043),
   gradientEndColor: Color(0xFF1A237E),
   paywallScene: fleetProScene,
+  logo: wrenchnoteLogo,
   onboarding: [
     OnboardingPage(
       icon: Icons.local_gas_station_outlined,

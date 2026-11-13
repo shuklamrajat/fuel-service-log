@@ -6,6 +6,7 @@ import 'package:app_core/art.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fuel_log/src/app.dart';
+import 'package:fuel_log/src/ui/logo.dart';
 import 'package:fuel_log/src/ui/scenes.dart';
 
 const out = String.fromEnvironment('ART_OUT', defaultValue: 'build/art');
@@ -13,12 +14,8 @@ const out = String.fromEnvironment('ART_OUT', defaultValue: 'build/art');
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   test('store art', () async {
-    await writeScenePng(
-      '$out/icon.png',
-      iconPaint((c, s, f) => wrenchnote(c, s.center(Offset.zero), s.width * 0.66, f, tilt: -0.08)),
-      const Size(1024, 1024),
-      fuelConfig,
-    );
+    // The in-app logo at rest, checked against brand/logo-1024.png.
+    await writeScenePng('$out/icon.png', wrenchnoteLogo, const Size(1024, 1024), fuelConfig, loop: 0);
     await writeScenePng(
       '$out/mascot.png',
       (c, s, f) => wrenchnote(c, s.center(Offset(0, s.height * 0.02)), s.width * 0.7, f, tilt: -0.08),
