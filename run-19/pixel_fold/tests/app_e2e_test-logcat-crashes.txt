@@ -1,0 +1,11 @@
+11-13 08:05:40.233   564   597 W ActivityManager: Slow operation: 89ms so far, now at startProcess: done updating battery stats
+11-13 08:05:40.234   564   597 W ActivityManager: Slow operation: 90ms so far, now at startProcess: building log message
+11-13 08:05:40.234   564   597 W ActivityManager: Slow operation: 90ms so far, now at startProcess: starting to update pids map
+11-13 08:05:40.234   564   597 W ActivityManager: Slow operation: 90ms so far, now at startProcess: done updating pids map
+11-13 08:06:19.908   564   597 W ActivityManager: Slow operation: 51ms so far, now at startProcess: starting to update pids map
+11-13 08:06:19.921   564   597 W ActivityManager: Slow operation: 64ms so far, now at startProcess: done updating pids map
+11-13 08:06:28.556   564  1562 W ActivityManager: Slow operation: 115ms so far, now at startProcess: done updating battery stats
+11-13 08:06:28.556   564  1562 W ActivityManager: Slow operation: 115ms so far, now at startProcess: building log message
+11-13 08:06:28.556   564  1562 W ActivityManager: Slow operation: 115ms so far, now at startProcess: starting to update pids map
+11-13 08:06:28.556   564  1562 W ActivityManager: Slow operation: 115ms so far, now at startProcess: done updating pids map
+11-13 08:06:28.580   564   597 W ActivityManager: Slow operation: 139ms so far, now at startProcess: returned from zygote!
