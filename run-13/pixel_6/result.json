@@ -1,0 +1,32 @@
+{
+  "package": "com.shuklamrajat.wrenchnote",
+  "device": "pixel_6 API 34",
+  "apk": "universal.apk",
+  "passed": false,
+  "checks": [
+    {
+      "check": "still running 8 s after launch",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "first screen: onboarding shows",
+      "want": true,
+      "got": false,
+      "ok": false
+    },
+    {
+      "check": "the session finished without an error",
+      "want": null,
+      "got": "no field \"Name\" (#0); fields on screen: []",
+      "ok": false
+    },
+    {
+      "check": "logcat has no crash for this app",
+      "want": [],
+      "got": [],
+      "ok": true
+    }
+  ]
+}
