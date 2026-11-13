@@ -376,7 +376,7 @@ void gaugeScene(Canvas c, Size s, SceneFrame f) {
     false,
     Paint()
       ..shader = const SweepGradient(
-        colors: [_orangeDark, _orange, Color(0xFF66BB6A)],
+        colors: [_orange, Color(0xFF66BB6A)],
         startAngle: math.pi,
         endAngle: 2 * math.pi,
       ).createShader(arc)
@@ -443,24 +443,19 @@ ScenePaint economyGaugeScene({required double score, required Color ink}) => (Ca
   final arc = Rect.fromCircle(center: o, radius: r);
   const start = math.pi * 0.85, sweep = math.pi * 1.3;
   final grow = phase(f.intro, 0, 0.45);
-  if (grow > 0.01) {
-    c.drawArc(
-      arc,
-      start,
-      sweep * grow,
-      false,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = r * 0.2
-        ..strokeCap = StrokeCap.butt
-        // Rotated rather than started at 0.85 turns: a sweep past a full turn
-        // wraps the colours, and red would show again at the green end.
-        ..shader = const SweepGradient(
-          endAngle: math.pi * 1.3,
-          colors: [Color(0xFFEF5350), Color(0xFFFFCA28), Color(0xFF66BB6A)],
-          transform: GradientRotation(math.pi * 0.85),
-        ).createShader(arc),
-    );
+  // Red to yellow to green, in short solid steps. No gradient shader here:
+  // a many-colour gradient is the one thing the Android emulator's GPU died on.
+  const steps = 36;
+  final band = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = r * 0.2;
+  for (var i = 0; i < steps * grow; i++) {
+    final t = i / (steps - 1);
+    band.color = t < 0.5
+        ? Color.lerp(const Color(0xFFEF5350), const Color(0xFFFFCA28), t * 2)!
+        : Color.lerp(const Color(0xFFFFCA28), const Color(0xFF66BB6A), (t - 0.5) * 2)!;
+    // A hair of overlap so no seams show between steps.
+    c.drawArc(arc, start + sweep * i / steps, sweep / steps + 0.01, false, band);
   }
   // Ticks.
   for (var i = 0; i <= 6; i++) {
