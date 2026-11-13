@@ -1,0 +1,1 @@
+11-13 13:48:56.893   554   579 W ActivityManager: Slow operation: 51ms so far, now at startProcess: done starting proc!
