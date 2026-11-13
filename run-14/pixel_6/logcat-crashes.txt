@@ -1,0 +1,2 @@
+11-13 07:52:38.810   527  3995 E ActivityManager: ANR in com.google.android.gms.persistent
+11-13 07:53:00.171   527  4479 E ActivityManager: ANR in com.google.android.gms.persistent
