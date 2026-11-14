@@ -25,7 +25,7 @@ jobs:
   submit:
     runs-on: ubuntu-latest
     env:
-      PACKAGE: com.shuklamrajat.wrenchnote
+      PACKAGE: com.studioswiddle.wrenchnote
       STORE: store/fuel_log
     steps:
       - uses: actions/checkout@v4

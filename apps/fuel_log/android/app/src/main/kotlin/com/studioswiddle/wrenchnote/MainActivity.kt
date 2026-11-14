@@ -1,4 +1,4 @@
-package com.shuklamrajat.wrenchnote
+package com.studioswiddle.wrenchnote
 
 import io.flutter.embedding.android.FlutterActivity
 
