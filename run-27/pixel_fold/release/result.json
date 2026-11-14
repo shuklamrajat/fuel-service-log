@@ -2,8 +2,8 @@
   "package": "com.studioswiddle.wrenchnote",
   "device": "pixel_fold API 35",
   "apk": "universal.apk",
-  "passed": false,
-  "emulator_stopped": true,
+  "passed": true,
+  "emulator_stopped": false,
   "android_stalls_not_the_app": [],
   "checks": [
     {
@@ -97,10 +97,70 @@
       "ok": true
     },
     {
-      "check": "the session finished without an error",
-      "want": null,
-      "got": "the emulator stopped answering",
-      "ok": false
+      "check": "cost report CSV export: the share sheet opens",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "cost report CSV export: still running after closing the share sheet",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "ads: still running after the banner had time to load",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "after reopening: Civic and both fill-ups are still there",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "after reopening: the edit (61.00) is still there",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "after reopening: no onboarding again",
+      "want": false,
+      "got": false,
+      "ok": true
+    },
+    {
+      "check": "delete: the 10,500 fill-up is gone from the list",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "delete: the 10,500 fill-up stays gone after reopening",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "still running after the delete and reopen",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "delete: the other fill-up (10,000) is untouched",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "still running at the end",
+      "want": true,
+      "got": true,
+      "ok": true
     },
     {
       "check": "logcat has no crash for this app",

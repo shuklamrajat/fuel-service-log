@@ -1,0 +1,16 @@
+11-14 04:04:31.542  1055  1167 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 1167 (bt_stack_manage), pid 1055 (droid.bluetooth)
+11-14 04:04:34.393   564   597 W ActivityManager: Slow operation: 72ms so far, now at startProcess: returned from zygote!
+11-14 04:04:34.393   564   597 W ActivityManager: Slow operation: 72ms so far, now at startProcess: done updating battery stats
+11-14 04:04:34.393   564   597 W ActivityManager: Slow operation: 72ms so far, now at startProcess: building log message
+11-14 04:04:34.393   564   597 W ActivityManager: Slow operation: 72ms so far, now at startProcess: starting to update pids map
+11-14 04:04:34.394   564   597 W ActivityManager: Slow operation: 73ms so far, now at startProcess: done updating pids map
+11-14 04:05:31.946   564   597 W ActivityManager: Slow operation: 58ms so far, now at startProcess: returned from zygote!
+11-14 04:05:31.946   564   597 W ActivityManager: Slow operation: 58ms so far, now at startProcess: done updating battery stats
+11-14 04:05:31.946   564   597 W ActivityManager: Slow operation: 58ms so far, now at startProcess: building log message
+11-14 04:05:31.946   564   597 W ActivityManager: Slow operation: 58ms so far, now at startProcess: starting to update pids map
+11-14 04:05:31.946   564   597 W ActivityManager: Slow operation: 58ms so far, now at startProcess: done updating pids map
+11-14 04:06:03.129   564   597 W ActivityManager: Slow operation: 185ms so far, now at startProcess: returned from zygote!
+11-14 04:06:03.130   564   597 W ActivityManager: Slow operation: 185ms so far, now at startProcess: done updating battery stats
+11-14 04:06:03.130   564   597 W ActivityManager: Slow operation: 186ms so far, now at startProcess: building log message
+11-14 04:06:03.130   564   597 W ActivityManager: Slow operation: 186ms so far, now at startProcess: starting to update pids map
+11-14 04:06:03.130   564   597 W ActivityManager: Slow operation: 186ms so far, now at startProcess: done updating pids map
