@@ -1,0 +1,112 @@
+{
+  "package": "com.studioswiddle.wrenchnote",
+  "device": "pixel_fold API 35",
+  "apk": "universal.apk",
+  "passed": false,
+  "emulator_stopped": true,
+  "android_stalls_not_the_app": [],
+  "checks": [
+    {
+      "check": "still running 8 s after launch",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "first screen: onboarding shows",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "set up: the Civic is saved and the home screen shows",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "add: both fill-ups are listed (10,000 and 10,500 on the odometer)",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "edit: the 10,500 fill-up now shows 61.00 paid",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "sideways: still running",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "sideways: the entries are still on screen",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "upright again: the entries are still on screen",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "Fold: the emulator folds",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "folded (outer screen): still running",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "folded (outer screen): the entries are still on screen",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "unfolded (inner screen): still running",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "unfolded (inner screen): the entries are still on screen",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "Settings opens",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "Settings sideways: still running",
+      "want": true,
+      "got": true,
+      "ok": true
+    },
+    {
+      "check": "the session finished without an error",
+      "want": null,
+      "got": "the emulator stopped answering",
+      "ok": false
+    },
+    {
+      "check": "logcat has no crash for this app",
+      "want": [],
+      "got": [],
+      "ok": true
+    }
+  ]
+}
